@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일터</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .button {
+
+        background-color: darkgoldenrod;
+
+        color: black;
+
+        padding: 7px 15px;
+
+        text-align: center;
+
+        text-decoration: none;
+
+        display: inline-block;
+
+        font-size: 16px;
+
+        margin: 4px 2px;
+
+        cursor: pointer;
+
+        -webkit-transition-duration: 0.4s; /* Safari */
+
+        transition-duration: 0.4s;
+        }
+
+        .button:hover {
+
+        background: darkgoldenrod; 
+
+        color: white;
+
+        }
+    </style>
+<body>
+    <p id="money"></p>
+    <div id="Area"></div>
+</body>
+        
+    <script>
+        var money = 10000000;
+        var st_1or = 50000; 
+        var st_2or = 200000;
+        var st_3or = 5000;
+        var st_4or = 100000;
+        var st_5or = 5000;
+        var st_1 = 50000; 
+        var st_2 = 200000;
+        var st_3 = 5000;
+        var st_4 = 100000;
+        var st_5 = 5000;
+        var up = 1;
+        var up_2 = 1;
+        var up_3 = 1;
+        var st_1buy = 0;
+        var st_2buy = 0;
+        var st_3buy = 0;
+        var st_4buy = 0;
+        var st_5buy = 0;
+        var st_num = 5;
+        var st_commission = 0.7;
+        var st_updatedelay = 500;
+
+        function numscale(number){
+            var inputNumber  = number < 0 ? false : number;
+            var unitWords    = ['원', '만', '억', '조', '경', '해', '자', '양', '구', '간', '정', '재', '극'];
+            var splitUnit    = 10000;
+            var splitCount   = unitWords.length;
+            var resultArray  = [];
+            var resultString = '';
+
+            for (var i = 0; i < splitCount; i++){
+                var unitResult = (inputNumber % Math.pow(splitUnit, i + 1)) / Math.pow(splitUnit, i);
+                unitResult = Math.floor(unitResult);
+                if (unitResult > 0){
+                    resultArray[i] = unitResult;
+                }
+            }
+
+            for (var i = 0; i < resultArray.length; i++){
+                if(!resultArray[i]) continue;
+                resultString = String(resultArray[i]) + unitWords[i] + resultString;
+            }
+
+            return resultString;
+        }
+
+        function $(input) {
+            return $(input)
+        }
+
+        function price(obj) {
+            return numscale(Math.round(obj))
+        }
+
+        function visibilty(id, state) {
+            $(id).style.visibility=state;
+        }
+
+        function pricechange(per, mob, enl, st) {
+            var add = Math.floor(Math.random() * per);
+            add -= mob;
+            add /= enl;
+            st *= 1 + add/100;
+            return st;
+        }
+
+        function create_p(id) {
+            let Area = $('Area');
+            let new_p = document.createElement('p');
+            new_p.setAttribute('id', id);
+            Area.appendChild(new_p);
+        }
+
+        function create_button(id, onclick, inner) {
+            let Area = $('Area');
+            let new_button = document.createElement('button');
+            new_button.setAttribute('class', 'button');
+            new_button.setAttribute('id', id);
+            new_button.setAttribute('onclick', onclick);
+            new_button.innerHTML = inner;
+            Area.appendChild(new_button);
+        }
+
+        function start_set() {
+            for (let num = 1; num <= st_num; num++) {
+                create_p("st_" + num)
+                create_button("st_" + num + "buy", "buy('st_" + num + "', 1)", "사기")
+                create_button("st_" + num + "buyall", "buyall('st_" + num + "')", "다사기")
+                create_button("st_" + num + "sell", "sell('st_" + num + "', 1)", "팔기")
+                create_button("st_" + num + "sellall", "sellall('st_" + num + "')", "다팔기")
+            }
+        }
+
+        window.start_set()
+
+        setInterval(function() {
+            $("st_1").innerHTML = "성주건설 : " + price(st_1) + "   " + st_1buy + "주 보유중";
+            $("st_2").innerHTML = "브로콜리화재보험 : " + price(st_2) + "   " + st_2buy + "주 보유중";
+            $("st_3").innerHTML = "이짐철강 : " + price(st_3) + "   " + st_3buy + "주 보유중";
+            $("st_4").innerHTML = "모기전자 : " + price(st_4) + "   " + st_4buy + "주 보유중";
+            $("st_5").innerHTML = "오리조선해양 : " + price(st_5) + "   " + st_5buy + "주 보유중";
+            $("money").innerHTML = "money : " + price(money);
+        },1)
+
+        setInterval(function() {
+            for (let num = 1; num <= st_num; num++) {
+                if (eval("st_" + num + "<= 50")) {
+                    visibilty("st_" + num + "buy","hidden");
+                    visibilty("st_" + num +"buyall","hidden");
+                    setTimeout(function() {
+                        visibilty("st_" + num + "sell","hidden");
+                        visibilty("st_" + num + "sellall","hidden");
+                    }, 5000);
+                }
+            }
+            for (let num = 1; num <= st_num; num++) {
+                if (eval("st_" + num + "> 50")) {
+                    visibilty("st_" + num + "buy","visible");
+                    visibilty("st_" + num +"buyall","visible");
+                    visibilty("st_" + num + "sell","visible");
+                    visibilty("st_" + num + "sellall","visible");
+                }
+            }
+            for (let num = 1; num <= st_num; num++) {
+                if (eval("st_" + num + "<= 10")) {
+                    eval("st_" + num + " = " + "st_" + num + "or;")
+                    visibilty("st_" + num + "buy","visible");
+                    visibilty("st_" + num +"buyall","visible");
+                    visibilty("st_" + num + "sell","visible");
+                    visibilty("st_" + num + "sellall","visible");
+                }
+            }
+        },10)
+
+        setInterval(function(){ 
+            var random = Math.floor(Math.random() * 101);
+            if (random <= 90) {
+                st_1 = pricechange(201, 100, 1000, st_1)
+            }
+            else {
+                if (random <= 99) {
+                    st_1 = pricechange(2001, 1000, 1000, st_1)
+                }
+                else {
+                    st_1 = pricechange(20001, 10000, 1000, st_1)
+                }
+            }
+        }, st_updatedelay);
+
+        setInterval(function(){ 
+            var random = Math.floor(Math.random() * 10001);
+            if (random <= 9000) {
+                st_2 = pricechange(201, 100, 1000, st_2)
+            }
+            else {
+                if (random <= 9900) {
+                    st_2 = pricechange(2001, 1000, 1000, st_2)
+                }
+                else {
+                    if (random <= 9990) {
+                        st_2 = pricechange(20001, 10000, 1000, st_2)
+                    }
+                    else {
+                        if (random <= 9999) {
+                            st_2 =pricechange(40002, 20000, 1000, st_2)
+                        }
+                        else {
+                            st_2 = pricechange(60003, 30000, 1000, st_2)
+                        }
+                    }
+                }
+            }
+        }, st_updatedelay);
+
+        setInterval(function() {
+            var random = Math.floor(Math.random() * 20);
+            if (random == 0) {
+                up *= -1;
+            }
+
+            if (up == 1) {
+                st_3 = pricechange(1100, 100, 100, st_3)
+            }
+
+            if (up == -1) {
+                st_3 = pricechange(1100, 1000, 100, st_3)
+            }
+        }, st_updatedelay);
+
+        setInterval(function() {
+            if (up_2 == 1){
+                var random = Math.floor(Math.random() * 500);
+                if (random == 0) {
+                    up_2 = -1
+                }
+                else {
+                    st_4 = pricechange(300, 200, 100, st_4)
+                }
+            }
+            else{
+                var random = Math.floor(Math.random() * 4);
+                if (random == 0) {
+                    up_2 = 1
+                }
+                else{
+                    var random = Math.floor(Math.random() * 4);
+                    var add = random + 1;
+                    st_4 *= add;
+                }
+            }
+        }, st_updatedelay);
+
+        setInterval(function() {
+            if (up_3 == 1){
+                var random = Math.floor(Math.random() * 500);
+                if (random == 0) {
+                    up_3 = -1
+                }
+                else {
+                    st_5 = pricechange(300, 100, 100, st_5)
+                }
+            }
+            else{
+                var random = Math.floor(Math.random() * 4);
+                if (random == 0) {
+                    up_3 = 1
+                }
+                else{
+                    var random = Math.floor(Math.random() * 4);
+                    var add = random + 1;
+                    st_5 /= add;
+                }
+            }
+        }, st_updatedelay);
+
+        function commission(st) {
+            return st*(1+st_commission/100)
+        }
+
+        function buy(st, vol) {
+            for (let num = 0; num < vol; num++){
+                if ( money >= commission(eval(st))) {
+                    eval(st + "buy += 1")
+                    money -= commission(eval(st))
+                }
+            }
+        }
+
+        function sell(st, vol) {
+            for (let num = 0; num < vol; num++){
+                if ( eval(st + "buy") >= 1) {
+                    eval(st + "buy -= 1")
+                    money += commission(eval(st))
+                }
+            }
+        }
+
+        function buyall(st) {
+            var buy = Math.floor(money/commission(eval(st)))
+            money -= buy*commission(eval(st))
+            eval(st + "buy += buy")
+        }
+
+        function sellall(st) {
+            money += eval(st + "buy")*commission(eval(st))
+            eval(st + "buy = 0")
+        }
+    </script>
+</html>
